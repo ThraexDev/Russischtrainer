@@ -1,6 +1,22 @@
 {
+  "forms": [
+    {
+      "name": "Präsens",
+      "id":"present",
+      "pronouns":[
+        "Inf",
+        "я",
+        "ты",
+        "он",
+        "мы",
+        "вы",
+        "они"
+      ]
+    }
+  ],
   "words": [
     {
+      "id": "machen",
       "german": "machen",
       "present": [
         "делаю",
