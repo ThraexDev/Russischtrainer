@@ -3,6 +3,7 @@ package de.learning.peter.russischtrainer;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -79,6 +80,7 @@ public class MainActivity extends AppCompatActivity {
                     pronounView.setText((String) form.getJSONArray("pronouns").get(i));
                     row.addView(pronounView);
                     EditText wordEdit = new EditText(this);
+                    wordEdit.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
                     row.addView(wordEdit);
                     Space space  = new Space(this);
                     space.setMinimumWidth(20);
@@ -88,10 +90,12 @@ public class MainActivity extends AppCompatActivity {
                     row.addView(answerView);
                     tl.addView(row);
                     if(i > 0){
-                        previousEdit.addTextChangedListener(new TextHandler(previousEdit,wordEdit, "test", previousView));
+                        String verbInRightForm = (String) word.getJSONArray(form.getString("id")).get(i-1);
+                        previousEdit.setOnEditorActionListener(new TextHandler(previousEdit,wordEdit, verbInRightForm, previousView));
                     }
                     if(pronounsArray.length()-1 == i){
-                        wordEdit.addTextChangedListener(new TextHandler(wordEdit, this.findViewById(R.id.button),"test", answerView));
+                        String verbInRightForm = (String) word.getJSONArray(form.getString("id")).get(i);
+                        wordEdit.setOnEditorActionListener(new TextHandler(wordEdit, this.findViewById(R.id.button),verbInRightForm, answerView));
                     }
                     previousEdit = wordEdit;
                     previousView = answerView;
@@ -107,4 +111,8 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public void clearView(){
+        TableLayout tl = (TableLayout) this.findViewById(R.id.verticalLayout);
+        tl.removeAllViews();
+    }
 }
