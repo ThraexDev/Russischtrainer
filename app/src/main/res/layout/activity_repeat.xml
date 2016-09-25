@@ -7,7 +7,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="de.learning.peter.russischtrainer.MainActivity">
+    tools:context=".RepeatActivity">
 
     <ScrollView
         xmlns:android="http://schemas.android.com/apk/res/android"
@@ -38,16 +38,17 @@
                 android:text="Wort"
                 android:id="@+id/wordView"
                 android:layout_alignTop="@+id/formView"
-                android:layout_toLeftOf="@+id/button"
-                android:layout_toStartOf="@+id/button" />
+                android:layout_toLeftOf="@+id/finishButton"
+                android:layout_toStartOf="@+id/finishButton" />
 
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Fertig"
-                android:id="@+id/button"
+                android:id="@+id/finishButton"
                 android:layout_alignParentBottom="true"
-                android:layout_centerHorizontal="true" />
+                android:layout_centerHorizontal="true"
+                android:onClick="onFinish" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -56,8 +57,8 @@
                 android:text="Form"
                 android:id="@+id/formView"
                 android:layout_alignParentTop="true"
-                android:layout_toRightOf="@+id/button"
-                android:layout_toEndOf="@+id/button" />
+                android:layout_toRightOf="@+id/finishButton"
+                android:layout_toEndOf="@+id/finishButton" />
         </RelativeLayout>
     </ScrollView>
 

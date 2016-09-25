@@ -1,12 +1,10 @@
 package de.learning.peter.russischtrainer;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.Editable;
 import android.text.InputType;
-import android.text.TextWatcher;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Space;
@@ -21,43 +19,51 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class MainActivity extends AppCompatActivity {
+public class RepeatActivity extends AppCompatActivity {
     private JSONArray wordsArray, formsArray;
+    private int formNumber = 0;
 
+    public void setWordAndForms(JSONObject word, JSONArray formsArray) {
+        this.word = word;
+        this.formsArray = formsArray;
+        formNumber = -1;
+        presentNextForm();
+    }
+
+    private void presentNextForm(){
+        formNumber++;
+        if(formNumber >= formsArray.length()){
+            finish();
+            return;
+        }
+        try {
+            if(!this.presentWordAndForm(word,(JSONObject) formsArray.get(formNumber))){
+                presentNextForm();
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+            presentNextForm();
+        }
+    }
+
+    JSONObject word = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        JSONObject jsonobj = null;
+        setContentView(R.layout.activity_repeat);
+        Intent i = getIntent();
+        String wordString = i.getStringExtra("Word");
+        String formString = i.getStringExtra("Forms");
         try {
-            jsonobj = new JSONObject(loadJSONFromAsset());
-            wordsArray = jsonobj.getJSONArray("words");
-            formsArray = jsonobj.getJSONArray("forms");
-            //testing
-            JSONObject word = (JSONObject) wordsArray.get(0);
-            JSONObject form = (JSONObject) formsArray.get(0);
-            this.setWord(word,form);
+            JSONObject jsonobj = new JSONObject(formString);
+            JSONArray array = jsonobj.getJSONArray("forms");
+            this.setWordAndForms(new JSONObject(wordString), array );
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
-    private String loadJSONFromAsset() {
-        String json = null;
-        try {
-            InputStream is = this.getAssets().open("words.json");
-            int size = is.available();
-            byte[] buffer = new byte[size];
-            is.read(buffer);
-            is.close();
-            json = new String(buffer, "UTF-8");
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            return null;
-        }
-        return json;
-    }
-
-    public boolean setWord(JSONObject word, JSONObject form){
+    private boolean presentWordAndForm(JSONObject word, JSONObject form){
+        clearView();
         TableLayout tl = (TableLayout) this.findViewById(R.id.verticalLayout);
         try {
             String formId = form.getString("id");
@@ -69,7 +75,6 @@ public class MainActivity extends AppCompatActivity {
                 JSONArray pronounsArray = form.getJSONArray("pronouns");
                 EditText previousEdit = null;
                 TextView previousView = null;
-                Log.i("event","loop");
                 for(int i = 0; i < pronounsArray.length(); i++){
                     TableRow row = new TableRow(this);
                     TableRow.LayoutParams rowStyle = new TableRow.LayoutParams();
@@ -95,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                     if(pronounsArray.length()-1 == i){
                         String verbInRightForm = (String) word.getJSONArray(form.getString("id")).get(i);
-                        wordEdit.setOnEditorActionListener(new TextHandler(wordEdit, this.findViewById(R.id.button),verbInRightForm, answerView));
+                        wordEdit.setOnEditorActionListener(new TextHandler(wordEdit, this.findViewById(R.id.finishButton),verbInRightForm, answerView));
                     }
                     previousEdit = wordEdit;
                     previousView = answerView;
@@ -109,6 +114,11 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
             return false;
         }
+    }
+
+    public void onFinish(View v){
+        Log.i("Finish","Finish");
+        this.presentNextForm();
     }
 
     public void clearView(){

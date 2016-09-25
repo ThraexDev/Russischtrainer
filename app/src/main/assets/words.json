@@ -12,6 +12,16 @@
         "вы",
         "они"
       ]
+    },
+    {
+      "name": "Vergangenheit",
+      "id":"past",
+      "pronouns":[
+        "я",
+        "ever",
+        "you",
+        "want"
+      ]
     }
   ],
   "words": [
@@ -26,6 +36,31 @@
         "делаем",
         "делаете",
         "делают"
+      ],
+      "past": [
+        "delal",
+        "random",
+        "word",
+        "peanuts"
+      ]
+    },
+    {
+      "id": "sagen",
+      "german": "sagen",
+      "present": [
+        "hier",
+        "bitte",
+        "russisch",
+        "einfügen",
+        "vielen",
+        "Dank",
+        ":*"
+      ],
+      "uniqueID": [
+        "some",
+        "other",
+        "word",
+        "cake"
       ]
     }
   ]
