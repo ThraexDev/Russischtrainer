@@ -1,11 +1,10 @@
 package de.learning.peter.russischtrainer;
 
+import android.app.Activity;
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.text.InputType;
-import android.util.Log;
-import android.view.View;
 import android.widget.EditText;
 import android.widget.Space;
 import android.widget.TableLayout;
@@ -13,38 +12,10 @@ import android.widget.TableRow;
 import android.widget.TextView;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
-import java.io.InputStream;
-
-public class RepeatActivity extends AppCompatActivity {
-    private JSONArray wordsArray, formsArray;
-    private int formNumber = 0;
-
-    public void setWordAndForms(JSONObject word, JSONArray formsArray) {
-        this.word = word;
-        this.formsArray = formsArray;
-        formNumber = -1;
-        presentNextForm();
-    }
-
-    private void presentNextForm(){
-        formNumber++;
-        if(formNumber >= formsArray.length()){
-            finish();
-            return;
-        }
-        try {
-            if(!this.presentWordAndForm(word,(JSONObject) formsArray.get(formNumber))){
-                presentNextForm();
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-            presentNextForm();
-        }
-    }
+public class RepeatActivity extends Activity {
+    RepeatController controller;
 
     JSONObject word = null;
     @Override
@@ -52,37 +23,31 @@ public class RepeatActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_repeat);
         Intent i = getIntent();
-        String wordString = i.getStringExtra("Word");
-        String formString = i.getStringExtra("Forms");
-        try {
-            JSONObject jsonobj = new JSONObject(formString);
-            JSONArray array = jsonobj.getJSONArray("forms");
-            this.setWordAndForms(new JSONObject(wordString), array );
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        String word = i.getStringExtra("Word");
+        String[] forms = i.getStringArrayExtra("Forms");
+        controller = new RepeatController(this, word, forms);
+        this.findViewById(R.id.finishButton).setOnClickListener(controller);
     }
-    private boolean presentWordAndForm(JSONObject word, JSONObject form){
+    public void presentWordAndForm(String word, String form){
         clearView();
         TableLayout tl = (TableLayout) this.findViewById(R.id.verticalLayout);
-        try {
-            String formId = form.getString("id");
-            if (word.has(formId)){
                 TextView wordView = (TextView)this.findViewById(R.id.wordView);
-                wordView.setText(word.getString("german"));
+                wordView.setText(Commons.nativeNameOf(word));
                 TextView formView = (TextView)this.findViewById(R.id.formView);
-                formView.setText(form.getString("name"));
-                JSONArray pronounsArray = form.getJSONArray("pronouns");
+                formView.setText(Commons.NativeFormNameOf(form));
+                String[] pronounsArray = Commons.pronounsArrayOf(form);
+                String[] wordInForm = Commons.wordInForm(word, form);
                 EditText previousEdit = null;
                 TextView previousView = null;
-                for(int i = 0; i < pronounsArray.length(); i++){
+                for(int i = 0; i < pronounsArray.length; i++){
                     TableRow row = new TableRow(this);
                     TableRow.LayoutParams rowStyle = new TableRow.LayoutParams();
-                    rowStyle.setMargins(0,10,0,0);
+                    //rowStyle.setMargins(0,200,0,0);
                     row.setLayoutParams(rowStyle);
                     TextView pronounView = new TextView(this);
                     pronounView.setTextAppearance(android.R.style.TextAppearance_Medium);
-                    pronounView.setText((String) form.getJSONArray("pronouns").get(i));
+                    pronounView.setText(pronounsArray[i]);
+                    pronounView.setTextColor(Color.BLACK);
                     row.addView(pronounView);
                     EditText wordEdit = new EditText(this);
                     wordEdit.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
@@ -95,31 +60,17 @@ public class RepeatActivity extends AppCompatActivity {
                     row.addView(answerView);
                     tl.addView(row);
                     if(i > 0){
-                        String verbInRightForm = (String) word.getJSONArray(form.getString("id")).get(i-1);
+                        String verbInRightForm = wordInForm[i-1];
                         previousEdit.setOnEditorActionListener(new TextHandler(previousEdit,wordEdit, verbInRightForm, previousView));
                     }
-                    if(pronounsArray.length()-1 == i){
-                        String verbInRightForm = (String) word.getJSONArray(form.getString("id")).get(i);
+                    if(pronounsArray.length - 1 == i){
+                        String verbInRightForm = wordInForm[i];
                         wordEdit.setOnEditorActionListener(new TextHandler(wordEdit, this.findViewById(R.id.finishButton),verbInRightForm, answerView));
                     }
                     previousEdit = wordEdit;
                     previousView = answerView;
                 }
-                return true;
             }
-            else{
-                return false;
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    public void onFinish(View v){
-        Log.i("Finish","Finish");
-        this.presentNextForm();
-    }
 
     public void clearView(){
         TableLayout tl = (TableLayout) this.findViewById(R.id.verticalLayout);

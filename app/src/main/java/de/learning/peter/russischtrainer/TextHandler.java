@@ -1,5 +1,6 @@
 package de.learning.peter.russischtrainer;
 
+import android.graphics.Color;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -25,16 +26,20 @@ public class TextHandler implements TextView.OnEditorActionListener {
 
     @Override
     public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-        Log.i("EVENT","ID "+actionId);
         if(actionId == 5 || actionId == 6){
             String userin = v.getText().toString();
             if(userin.equals(word)){
+                et.setTextColor(Color.GREEN);
+                tv.setTextColor(Color.GREEN);
                 tv.setText("richtig");
             }
             else {
+                et.setTextColor(Color.RED);
+                tv.setTextColor(Color.RED);
                 tv.setText(word);
             }
             next.requestFocus();
+            et.setEnabled(false);
         }
         return true;
     }
