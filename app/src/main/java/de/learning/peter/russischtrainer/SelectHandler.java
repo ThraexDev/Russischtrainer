@@ -18,6 +18,7 @@ public class SelectHandler implements View.OnClickListener {
     }
     @Override
     public void onClick(View v) {
-        Commons.repeatWord(c,word, Commons.getAllForms());
+        Commons.addLearnedWord(word);
+        Commons.repeatWord(c, word, Commons.getAllForms());
     }
 }

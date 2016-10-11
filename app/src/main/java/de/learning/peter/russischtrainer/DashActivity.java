@@ -6,10 +6,13 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 
-public class DashActivity extends Activity {
+public class DashActivity extends AppCompatActivity {
 
 
     @Override
@@ -17,7 +20,32 @@ public class DashActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_dash);
+        Commons.init(this);
+        Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
+        setSupportActionBar(myToolbar);
+        Commons.saveOwnWords(this);
+        Commons.saveOwnWords(this);
+    }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
+        getMenuInflater().inflate(R.menu.mainmenu, menu);
+        return true;
+    }
+
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+        Commons.saveOwnWords(this);
+    }
+
+    public void onWords(MenuItem item){
+        Commons.showAllWords(this);
+    }
+
+    public void onList(MenuItem item){
+        Commons.showLearnedWords(this);
     }
 
 }
