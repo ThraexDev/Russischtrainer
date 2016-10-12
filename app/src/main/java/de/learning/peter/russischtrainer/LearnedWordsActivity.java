@@ -28,7 +28,7 @@ public class LearnedWordsActivity extends AppCompatActivity {
             TableRow row = new TableRow(this);
             Button b = new Button(this);
             b.setText(Commons.nativeNameOf(wordsArray[i]));
-            b.setOnClickListener(new SelectHandler(wordsArray[i] ,this));
+            b.setOnClickListener(new DetailHandler(wordsArray[i] ,this));
             row.addView(b);
             tl.addView(row);
         }

@@ -8,6 +8,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -44,6 +45,7 @@ public final class Commons {
     private static HashMap<String, JSONObject> formMap = null;
     private static HashMap<String, Verb> learnedMap = null;
     private static ArrayList<Verb> learnedWords = null;
+    private static Context mainActivity = null;
 
     private Commons() {
     }
@@ -121,6 +123,7 @@ public final class Commons {
             allWordsAndForms = loadJSONFromAsset(context, WORDSFILENAME);
         }
         loadLearnedWords(context);
+        mainActivity = context;
     }
 
     static JSONObject loadJSONFromAsset(Context context, String name) {
@@ -245,14 +248,17 @@ public final class Commons {
         c.startActivity(intent);
     }
 
-    public static void saveOwnWords(Context c) {
-        JSONObject o = new JSONObject();
-        JSONArray a = new JSONArray();
+    public static void showDetailWord(Context c, String id) {
+        Intent intent = new Intent(c, WordDetailActivity.class);
+        intent.putExtra("ID", id);
+        c.startActivity(intent);
+    }
+
+    private static void saveOwnWord(Context c, String id) {
+        Verb v = (Verb) getLearnedHashMap().get(id);
         FileOutputStream fos = null;
+        JSONObject word = new JSONObject();
         try {
-            for (int i = 0; i < learnedWords.size(); i++) {
-                Verb v = learnedWords.get(i);
-                JSONObject word = new JSONObject();
                 word.put(WORDID, v.getId());
                 word.put(DATEADD, v.getAdded().getTime());
                 word.put(MUSTBEREPEATED, v.isMustBeRepeated());
@@ -263,13 +269,10 @@ public final class Commons {
                     form.put(DATEREP, v.getVerbforms()[j].getLastRepeated().getTime());
                     form.put(LEVEL, v.getVerbforms()[j].getLevel());
                     formArray.put(form);
-                }
                 word.put(LEARNEDWORDSFORMS, formArray);
-                a.put(word);
             }
-            o.put(LEARNEDWORDS, a);
-            fos = c.openFileOutput(LEARNEDWORDSFILE, Context.MODE_PRIVATE);
-            fos.write(o.toString().getBytes());
+            fos = c.openFileOutput(v.getId(), Context.MODE_PRIVATE);
+            fos.write(word.toString().getBytes());
             fos.close();
         } catch (JSONException e) {
             e.printStackTrace();
@@ -302,34 +305,35 @@ public final class Commons {
 
     private static void loadLearnedWords(Context c) {
         learnedWords = new ArrayList<Verb>();
-        try {
-            String s = loadFile(c, LEARNEDWORDSFILE);
-            if(s==null){
-                return;
-            }
-            JSONObject o = new JSONObject(loadFile(c, LEARNEDWORDSFILE));
-            JSONArray a = o.getJSONArray(LEARNEDWORDS);
-            for (int i = 0; i < a.length(); i++) {
-                JSONObject word = (JSONObject) a.get(i);
-                Verb v = new Verb();
-                v.setId(word.getString(WORDID));
-                v.setAdded(new Date(word.getInt(DATEADD)));
-                v.setMustBeRepeated(word.getBoolean(MUSTBEREPEATED));
-                JSONArray formArray = word.getJSONArray(LEARNEDWORDSFORMS);
-                VerbForm[] vf = new VerbForm[formArray.length()];
-                for (int j = 0; j < formArray.length(); j++) {
-                    JSONObject form = (JSONObject) formArray.get(j);
-                    VerbForm verbForm = new VerbForm();
-                    verbForm.setId(form.getString(FORMID));
-                    verbForm.setLastRepeated(new Date(form.getInt(DATEREP)));
-                    verbForm.setLevel(form.getInt(LEVEL));
-                    vf[j] = verbForm;
+        File files[] = c.getFilesDir().listFiles();
+        for(File file: files){
+            if(getWordsHashMap().containsKey(file.getName())){
+                try {
+                    String s = loadFile(c, file.getName());
+                    if(s==null){
+                        return;
+                    }
+                    JSONObject word = new JSONObject(s);
+                        Verb v = new Verb();
+                        v.setId(word.getString(WORDID));
+                        v.setAdded(new Date(word.getInt(DATEADD)));
+                        v.setMustBeRepeated(word.getBoolean(MUSTBEREPEATED));
+                        JSONArray formArray = word.getJSONArray(LEARNEDWORDSFORMS);
+                        VerbForm[] vf = new VerbForm[formArray.length()];
+                        for (int j = 0; j < formArray.length(); j++) {
+                            JSONObject form = (JSONObject) formArray.get(j);
+                            VerbForm verbForm = new VerbForm();
+                            verbForm.setId(form.getString(FORMID));
+                            verbForm.setLastRepeated(new Date(form.getInt(DATEREP)));
+                            verbForm.setLevel(form.getInt(LEVEL));
+                            vf[j] = verbForm;
+                        }
+                        v.setVerbforms(vf);
+                        learnedWords.add(v);
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
-                v.setVerbforms(vf);
-                learnedWords.add(v);
             }
-        } catch (JSONException e) {
-            e.printStackTrace();
         }
     }
     public static void addLearnedWord(String id){
@@ -352,6 +356,7 @@ public final class Commons {
         }
         verb.setVerbforms(vf);
         learnedWords.add(verb);
+        saveOwnWord(mainActivity, id);
     }
 
     public static void removeLearnedWord(String id){
@@ -366,6 +371,13 @@ public final class Commons {
                 break;
             }
         }
+        File files[] = mainActivity.getFilesDir().listFiles();
+        for(File file: files){
+            if(file.getName().equals(id)){
+                file.delete();
+            }
+        }
+
     }
 
     public static boolean isLearned(String id){
@@ -379,5 +391,17 @@ public final class Commons {
             r[i]= learnedWords.get(i).getId();
         }
         return r;
+    }
+
+    public static VerbForm getVerbForm(String wordId, String formId){
+        Verb v =(Verb) getLearnedHashMap().get(wordId);
+
+        if(v !=null){
+            for(VerbForm vf : v.getVerbforms()){
+                if(vf.getId().equals(formId)) return vf;
+            }
+        }
+        return null;
+
     }
 }
