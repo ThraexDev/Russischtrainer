@@ -37,10 +37,12 @@ public final class Commons {
     private final static String DATEADD = "adddate";
     private final static String DATEREP = "repdate";
     private final static String LEVEL = "level";
+    private final static String MUSTBEREPEATED="repeat";
     private static JSONArray wordsArray = null;
     private static JSONArray formsArray = null;
     private static HashMap<String, JSONObject> wordMap = null;
     private static HashMap<String, JSONObject> formMap = null;
+    private static HashMap<String, Verb> learnedMap = null;
     private static ArrayList<Verb> learnedWords = null;
 
     private Commons() {
@@ -73,6 +75,16 @@ public final class Commons {
             }
         }
         return formMap;
+    }
+
+    private static HashMap getLearnedHashMap() {
+        if (learnedMap == null) {
+                learnedMap = new HashMap<String, Verb>();
+                for (int i = 0; i < learnedWords.size(); i++) {
+                    learnedMap.put(learnedWords.get(i).getId(), learnedWords.get(i));
+                }
+        }
+        return learnedMap;
     }
 
     private static JSONArray getWordsArray() {
@@ -243,6 +255,7 @@ public final class Commons {
                 JSONObject word = new JSONObject();
                 word.put(WORDID, v.getId());
                 word.put(DATEADD, v.getAdded().getTime());
+                word.put(MUSTBEREPEATED, v.isMustBeRepeated());
                 JSONArray formArray = new JSONArray();
                 for(int j = 0; j < v.getVerbforms().length; j++){
                     JSONObject form = new JSONObject();
@@ -252,6 +265,7 @@ public final class Commons {
                     formArray.put(form);
                 }
                 word.put(LEARNEDWORDSFORMS, formArray);
+                a.put(word);
             }
             o.put(LEARNEDWORDS, a);
             fos = c.openFileOutput(LEARNEDWORDSFILE, Context.MODE_PRIVATE);
@@ -287,15 +301,20 @@ public final class Commons {
     }
 
     private static void loadLearnedWords(Context c) {
+        learnedWords = new ArrayList<Verb>();
         try {
+            String s = loadFile(c, LEARNEDWORDSFILE);
+            if(s==null){
+                return;
+            }
             JSONObject o = new JSONObject(loadFile(c, LEARNEDWORDSFILE));
             JSONArray a = o.getJSONArray(LEARNEDWORDS);
-            learnedWords = new ArrayList<Verb>();
             for (int i = 0; i < a.length(); i++) {
                 JSONObject word = (JSONObject) a.get(i);
                 Verb v = new Verb();
                 v.setId(word.getString(WORDID));
                 v.setAdded(new Date(word.getInt(DATEADD)));
+                v.setMustBeRepeated(word.getBoolean(MUSTBEREPEATED));
                 JSONArray formArray = word.getJSONArray(LEARNEDWORDSFORMS);
                 VerbForm[] vf = new VerbForm[formArray.length()];
                 for (int j = 0; j < formArray.length(); j++) {
@@ -314,9 +333,14 @@ public final class Commons {
         }
     }
     public static void addLearnedWord(String id){
+        if(getLearnedHashMap().containsKey(id)){
+            return;
+        }
+        learnedMap = null;
         Verb verb = new Verb();
         verb.setId(id);
         verb.setAdded(new Date());
+        verb.setMustBeRepeated(false);
         String[] forms = getAllForms();
         VerbForm[] vf = new VerbForm[forms.length];
         for(int i = 0; i < forms.length; i++){
@@ -328,6 +352,25 @@ public final class Commons {
         }
         verb.setVerbforms(vf);
         learnedWords.add(verb);
+    }
+
+    public static void removeLearnedWord(String id){
+        if(!getLearnedHashMap().containsKey(id)){
+            return;
+        }
+        learnedMap = null;
+        Verb verb = new Verb();
+        for(int i = 0; i < learnedWords.size(); i++){
+            if(learnedWords.get(i).getId().equals(id)){
+                learnedWords.remove(i);
+                break;
+            }
+        }
+    }
+
+    public static boolean isLearned(String id){
+        if(getLearnedHashMap().containsKey(id)) return true;
+        return false;
     }
 
     public static String[] getLearnedWords(){

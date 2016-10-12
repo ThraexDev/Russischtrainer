@@ -1,6 +1,7 @@
 package de.learning.peter.russischtrainer;
 
 import android.app.Activity;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
@@ -21,6 +22,7 @@ public class SelectActivity extends AppCompatActivity {
                 Button b = new Button(this);
                 b.setText(Commons.nativeNameOf(wordsArray[i]));
                 b.setOnClickListener(new SelectHandler(wordsArray[i] ,this));
+                if(Commons.isLearned(wordsArray[i])) b.setTextColor(Color.BLUE);
                 row.addView(b);
                 tl.addView(row);
             }

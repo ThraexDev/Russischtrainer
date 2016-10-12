@@ -2,7 +2,9 @@ package de.learning.peter.russischtrainer;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.view.View;
+import android.widget.Button;
 
 import org.json.JSONObject;
 
@@ -20,5 +22,7 @@ public class SelectHandler implements View.OnClickListener {
     public void onClick(View v) {
         Commons.addLearnedWord(word);
         Commons.repeatWord(c, word, Commons.getAllForms());
+        Button b = (Button)v;
+        b.setTextColor(Color.BLUE);
     }
 }
