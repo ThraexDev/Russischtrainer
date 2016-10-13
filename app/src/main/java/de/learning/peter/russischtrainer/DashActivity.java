@@ -23,8 +23,6 @@ public class DashActivity extends AppCompatActivity {
         Commons.init(this);
         Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
-        Commons.saveOwnWords(this);
-        Commons.saveOwnWords(this);
     }
 
     @Override
@@ -34,11 +32,6 @@ public class DashActivity extends AppCompatActivity {
         return true;
     }
 
-    @Override
-    public void onDestroy(){
-        super.onDestroy();
-        Commons.saveOwnWords(this);
-    }
 
     public void onWords(MenuItem item){
         Commons.showAllWords(this);
