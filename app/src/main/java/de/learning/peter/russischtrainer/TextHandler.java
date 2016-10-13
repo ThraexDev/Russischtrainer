@@ -17,6 +17,12 @@ public class TextHandler implements TextView.OnEditorActionListener {
     private View next;
     private TextView tv;
     private String word;
+
+    public boolean isRight() {
+        return right;
+    }
+
+    private boolean right =false;
     public TextHandler(EditText et, View next, String word, TextView tv){
         this.et = et;
         this.next = next;
@@ -32,6 +38,7 @@ public class TextHandler implements TextView.OnEditorActionListener {
                 et.setTextColor(Color.GREEN);
                 tv.setTextColor(Color.GREEN);
                 tv.setText("richtig");
+                right=true;
             }
             else {
                 et.setTextColor(Color.RED);

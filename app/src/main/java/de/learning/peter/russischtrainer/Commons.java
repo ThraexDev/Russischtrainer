@@ -404,4 +404,18 @@ public final class Commons {
         return null;
 
     }
+
+    public static void increaseLevel(String word, String form) {
+        VerbForm vf = getVerbForm(word, form);
+        vf.setLevel(vf.getLevel()+1);
+        saveOwnWord(mainActivity, word);
+    }
+
+    public static void decreaseLevel(String word, String form) {
+        VerbForm vf = getVerbForm(word, form);
+        if(vf.getLevel() > 0){
+            vf.setLevel(vf.getLevel()-1);
+            saveOwnWord(mainActivity, word);
+        }
+    }
 }

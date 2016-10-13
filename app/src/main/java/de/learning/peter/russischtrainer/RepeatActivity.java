@@ -28,7 +28,7 @@ public class RepeatActivity extends Activity {
         controller = new RepeatController(this, word, forms);
         this.findViewById(R.id.finishButton).setOnClickListener(controller);
     }
-    public void presentWordAndForm(String word, String form){
+    public void presentWordAndForm(RepeatController con, String word, String form){
         clearView();
         TableLayout tl = (TableLayout) this.findViewById(R.id.verticalLayout);
                 TextView wordView = (TextView)this.findViewById(R.id.wordView);
@@ -61,11 +61,15 @@ public class RepeatActivity extends Activity {
                     tl.addView(row);
                     if(i > 0){
                         String verbInRightForm = wordInForm[i-1];
-                        previousEdit.setOnEditorActionListener(new TextHandler(previousEdit,wordEdit, verbInRightForm, previousView));
+                        TextHandler th = new TextHandler(previousEdit,wordEdit, verbInRightForm, previousView);
+                        previousEdit.setOnEditorActionListener(th);
+                        con.getTextHandlers().add(th);
                     }
                     if(pronounsArray.length - 1 == i){
                         String verbInRightForm = wordInForm[i];
-                        wordEdit.setOnEditorActionListener(new TextHandler(wordEdit, this.findViewById(R.id.finishButton),verbInRightForm, answerView));
+                        TextHandler th = new TextHandler(wordEdit, this.findViewById(R.id.finishButton),verbInRightForm, answerView);
+                        wordEdit.setOnEditorActionListener(th);
+                        con.getTextHandlers().add(th);
                     }
                     previousEdit = wordEdit;
                     previousView = answerView;
