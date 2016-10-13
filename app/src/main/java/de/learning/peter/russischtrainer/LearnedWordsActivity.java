@@ -22,7 +22,14 @@ public class LearnedWordsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_learned_words);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
         TableLayout tl = (TableLayout) this.findViewById(R.id.tableWordLayout);
+        tl.removeAllViews();
         String[] wordsArray = Commons.getLearnedWords();
         for(int i = 0; i < wordsArray.length; i++){
             TableRow row = new TableRow(this);

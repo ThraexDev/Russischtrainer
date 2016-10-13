@@ -22,7 +22,5 @@ public class SelectHandler implements View.OnClickListener {
     public void onClick(View v) {
         Commons.addLearnedWord(word);
         Commons.repeatWord(c, word, Commons.getAllForms());
-        Button b = (Button)v;
-        b.setTextColor(Color.BLUE);
     }
 }
