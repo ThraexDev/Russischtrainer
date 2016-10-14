@@ -46,7 +46,7 @@ public final class Commons {
     private static HashMap<String, Verb> learnedMap = null;
     private static ArrayList<Verb> learnedWords = null;
     private static Context mainActivity = null;
-
+    private static long repeatTimes[] = {0,86400000,172800000,345600000,691200000,1382400000};
     private Commons() {
     }
 
@@ -248,6 +248,11 @@ public final class Commons {
         c.startActivity(intent);
     }
 
+    public static void showRepeats(Context c) {
+        Intent intent = new Intent(c, RepeatManager.class);
+        c.startActivity(intent);
+    }
+
     public static void showDetailWord(Context c, String id) {
         Intent intent = new Intent(c, WordDetailActivity.class);
         intent.putExtra("ID", id);
@@ -261,13 +266,13 @@ public final class Commons {
         try {
                 word.put(WORDID, v.getId());
                 word.put(DATEADD, v.getAdded().getTime());
-                word.put(MUSTBEREPEATED, v.isMustBeRepeated());
                 JSONArray formArray = new JSONArray();
                 for(int j = 0; j < v.getVerbforms().length; j++){
                     JSONObject form = new JSONObject();
                     form.put(FORMID, v.getVerbforms()[j].getId());
                     form.put(DATEREP, v.getVerbforms()[j].getLastRepeated().getTime());
                     form.put(LEVEL, v.getVerbforms()[j].getLevel());
+                    form.put(MUSTBEREPEATED, v.getVerbforms()[j].isMustBeRepeated());
                     formArray.put(form);
                 word.put(LEARNEDWORDSFORMS, formArray);
             }
@@ -317,15 +322,15 @@ public final class Commons {
                         Verb v = new Verb();
                         v.setId(word.getString(WORDID));
                         v.setAdded(new Date(word.getInt(DATEADD)));
-                        v.setMustBeRepeated(word.getBoolean(MUSTBEREPEATED));
                         JSONArray formArray = word.getJSONArray(LEARNEDWORDSFORMS);
                         VerbForm[] vf = new VerbForm[formArray.length()];
                         for (int j = 0; j < formArray.length(); j++) {
                             JSONObject form = (JSONObject) formArray.get(j);
                             VerbForm verbForm = new VerbForm();
                             verbForm.setId(form.getString(FORMID));
-                            verbForm.setLastRepeated(new Date(form.getInt(DATEREP)));
+                            verbForm.setLastRepeated(new Date(form.getLong(DATEREP)));
                             verbForm.setLevel(form.getInt(LEVEL));
+                            verbForm.setMustBeRepeated(form.getBoolean(MUSTBEREPEATED));
                             vf[j] = verbForm;
                         }
                         v.setVerbforms(vf);
@@ -344,14 +349,14 @@ public final class Commons {
         Verb verb = new Verb();
         verb.setId(id);
         verb.setAdded(new Date());
-        verb.setMustBeRepeated(false);
         String[] forms = getAllForms();
         VerbForm[] vf = new VerbForm[forms.length];
         for(int i = 0; i < forms.length; i++){
             VerbForm verbForm = new VerbForm();
             verbForm.setId(forms[i]);
-            verbForm.setLastRepeated(new Date(0));
+            verbForm.setLastRepeated(new Date());
             verbForm.setLevel(1);
+            verbForm.setMustBeRepeated(false);
             vf[i]= verbForm;
         }
         verb.setVerbforms(vf);
@@ -407,15 +412,38 @@ public final class Commons {
 
     public static void increaseLevel(String word, String form) {
         VerbForm vf = getVerbForm(word, form);
-        vf.setLevel(vf.getLevel()+1);
-        saveOwnWord(mainActivity, word);
+        if(vf.getLevel() < 6){
+            vf.setMustBeRepeated(false);
+            vf.setLevel(vf.getLevel()+1);
+            saveOwnWord(mainActivity, word);
+        }
     }
 
     public static void decreaseLevel(String word, String form) {
         VerbForm vf = getVerbForm(word, form);
         if(vf.getLevel() > 0){
+            vf.setMustBeRepeated(true);
             vf.setLevel(vf.getLevel()-1);
             saveOwnWord(mainActivity, word);
         }
+    }
+
+    public static void setLastRepeated(String word, String form, Date d) {
+        VerbForm vf = getVerbForm(word, form);
+        vf.setLastRepeated(d);
+    }
+
+    public static RepeatPair[] getWordsToRepeat(){
+        ArrayList<RepeatPair> list = new ArrayList<RepeatPair>();
+        for(int i = 0; i < learnedWords.size(); i++){
+            Verb v =  learnedWords.get(i);
+            for(int j = 0; j < v.getVerbforms().length; j++){
+                VerbForm vf = v.getVerbforms()[j];
+                if(vf.mustBeRepeated || new Date().getTime() - vf.lastRepeated.getTime() >  repeatTimes[vf.getLevel()]){
+                    list.add(new RepeatPair(v.getId(), vf.getId()));
+                }
+            }
+        }
+        return list.toArray(new RepeatPair[list.size()]);
     }
 }

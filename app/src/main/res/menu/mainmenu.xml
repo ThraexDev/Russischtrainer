@@ -3,6 +3,9 @@
     <item android:id="@+id/select"
         android:title="@string/words"
         android:onClick="onWords"/>
+    <item android:id="@+id/repeat"
+        android:title="@string/repeat"
+        android:onClick="onRepeat"/>/>
     <item android:id="@+id/mywords"
         android:title="@string/myList"
         android:onClick="onList"/>/>

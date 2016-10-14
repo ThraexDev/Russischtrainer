@@ -41,4 +41,8 @@ public class DashActivity extends AppCompatActivity {
         Commons.showLearnedWords(this);
     }
 
+    public void onRepeat(MenuItem item){
+        Commons.showRepeats(this);
+    }
+
 }

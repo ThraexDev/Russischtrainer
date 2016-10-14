@@ -7,6 +7,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * Created by Peter on 09.10.2016.
@@ -42,6 +43,7 @@ public class RepeatController implements View.OnClickListener {
             Commons.increaseLevel(word, forms[formNumber]);
         }
         else Commons.decreaseLevel(word, forms[formNumber]);
+        Commons.setLastRepeated(word, forms[formNumber], new Date());
         textHandlers = new ArrayList<TextHandler>();
         formNumber++;
         if(checkForFinish()) return;

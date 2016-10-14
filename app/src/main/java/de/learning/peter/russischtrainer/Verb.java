@@ -35,14 +35,4 @@ public class Verb {
     }
 
     VerbForm[] verbforms;
-
-    boolean mustBeRepeated;
-
-    public boolean isMustBeRepeated() {
-        return mustBeRepeated;
-    }
-
-    public void setMustBeRepeated(boolean mustBeRepeated) {
-        this.mustBeRepeated = mustBeRepeated;
-    }
 }

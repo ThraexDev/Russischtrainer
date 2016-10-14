@@ -34,4 +34,14 @@ public class VerbForm {
     public int getLevel() {
         return level;
     }
+
+    boolean mustBeRepeated;
+
+    public boolean isMustBeRepeated() {
+        return mustBeRepeated;
+    }
+
+    public void setMustBeRepeated(boolean mustBeRepeated) {
+        this.mustBeRepeated = mustBeRepeated;
+    }
 }

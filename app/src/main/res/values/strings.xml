@@ -11,4 +11,5 @@
     <string name="myList">Meine Liste</string>
 
     <string name="title_activity_learned_words">LearnedWordsActivity</string>
+    <string name="repeat">Wiederholen</string>
 </resources>
