@@ -11,6 +11,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.TextView;
 
 public class DashActivity extends AppCompatActivity {
 
@@ -23,6 +24,15 @@ public class DashActivity extends AppCompatActivity {
         Commons.init(this);
         Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        TextView tv = (TextView) findViewById(R.id.verben);
+        tv.setText("Du kennst "+Commons.getLearnedWords().length+" Verb(en)");
+        TextView tv2 = (TextView) findViewById(R.id.verbformen);
+        tv2.setText("Du musst "+Commons.getWordsToRepeat().length+" Verbform(en) wiederholen");
     }
 
     @Override
@@ -42,6 +52,14 @@ public class DashActivity extends AppCompatActivity {
     }
 
     public void onRepeat(MenuItem item){
+        Commons.showRepeats(this);
+    }
+
+    public void onWordsB(View v){
+        Commons.showAllWords(this);
+    }
+
+    public void onRepeatB(View v){
         Commons.showRepeats(this);
     }
 

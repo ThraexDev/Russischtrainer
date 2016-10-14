@@ -13,11 +13,9 @@
         android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
         />
 
-    <LinearLayout
-        android:orientation="vertical"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="60dp">
+        android:layout_height="match_parent">
 
         <TextView
             android:layout_width="wrap_content"
@@ -25,7 +23,48 @@
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:text="Viel Spaß beim Lernen!"
             android:id="@+id/textView2"
-            android:layout_gravity="center_horizontal" />
-    </LinearLayout>
+            android:layout_marginTop="83dp"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true" />
+
+        <Button
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Neue hinzufügen"
+            android:id="@+id/button2"
+            android:onClick="onWordsB"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="Du kennst ? Verben"
+            android:id="@+id/verben"
+            android:layout_above="@+id/button2"
+            android:layout_centerHorizontal="true" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="Du musst ? Verbformen wiederholen"
+            android:id="@+id/verbformen"
+            android:layout_marginTop="39dp"
+            android:layout_below="@+id/button2"
+            android:layout_centerHorizontal="true" />
+
+        <Button
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Jetzt wiederholen"
+            android:id="@+id/button3"
+            android:onClick="onRepeatB"
+            android:layout_below="@+id/verbformen"
+            android:layout_centerHorizontal="true" />
+    </RelativeLayout>
 
 </FrameLayout>
